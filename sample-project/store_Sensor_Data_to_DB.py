@@ -7,72 +7,56 @@
 #------------------------------------------
 
 
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+import pymongo
 import json
-import sqlite3
 
-# SQLite DB Name
-DB_Name =  "IoT.db"
+client = MongoClient(
+	'mongodb+srv://kasucjusz:bartekdawid@cloudcomputingclass.flxo2.mongodb.net/<dbname>?retryWrites=true&w=majority')
 
-#===============================================================
-# Database Manager Class
+db = client.mqtt
 
-class DatabaseManager():
-	def __init__(self):
-		self.conn = sqlite3.connect(DB_Name)
-		self.conn.execute('pragma foreign_keys = on')
-		self.conn.commit()
-		self.cur = self.conn.cursor()
-		
-	def add_del_update_db_record(self, sql_query, args=()):
-		self.cur.execute(sql_query, args)
-		self.conn.commit()
-		return
+tempSensors = db['sensors'].find({'topic': 'Temperature'})
 
-	def __del__(self):
-		self.cur.close()
-		self.conn.close()
 
-#===============================================================
-# Functions to push Sensor Data into Database
-
-# Function to save Temperature to DB Table
-def DHT22_Temp_Data_Handler(jsonData):
-	#Parse Data 
+def tempHandler(jsonData):
 	json_Dict = json.loads(jsonData)
 	SensorID = json_Dict['Sensor_ID']
 	Data_and_Time = json_Dict['Date']
 	Temperature = json_Dict['Temperature']
-	
-	#Push into DB Table
-	dbObj = DatabaseManager()
-	dbObj.add_del_update_db_record("insert into DHT22_Temperature_Data (SensorID, Date_n_Time, Temperature) values (?,?,?)",[SensorID, Data_and_Time, Temperature])
-	del dbObj
-	print ("Inserted Temperature Data into Database.")
-	print ("")
+	toSave = {"sensorId": SensorID,
+			  "date": Data_and_Time, "temp": Temperature}
 
-# Function to save Humidity to DB Table
-def DHT22_Humidity_Data_Handler(jsonData):
-	#Parse Data 
+	db.temperature.insert_one(toSave)
+
+
+def humHandler(jsonData):
 	json_Dict = json.loads(jsonData)
 	SensorID = json_Dict['Sensor_ID']
 	Data_and_Time = json_Dict['Date']
 	Humidity = json_Dict['Humidity']
-	
-	#Push into DB Table
-	dbObj = DatabaseManager()
-	dbObj.add_del_update_db_record("insert into DHT22_Humidity_Data (SensorID, Date_n_Time, Humidity) values (?,?,?)",[SensorID, Data_and_Time, Humidity])
-	del dbObj
-	print ("Inserted Humidity Data into Database.")
-	print ("")
+	toSave = {"sensorId": SensorID,
+			  "date": Data_and_Time, "humidity": Humidity}
+
+	db.humidity.insert_one(toSave)
 
 
-#===============================================================
-# Master Function to Select DB Funtion based on MQTT Topic
+def acidityHandler(jsonData):
+	json_Dict = json.loads(jsonData)
+	SensorID = json_Dict['Sensor_ID']
+	Data_and_Time = json_Dict['Date']
+	Acidity = json_Dict['Acidity']
+	toSave = {"sensorId": SensorID,
+			  "date": Data_and_Time, "acidity": Acidity}
+
+	db.acidity.insert_one(toSave)
+
 
 def sensor_Data_Handler(Topic, jsonData):
-	if Topic == "Home/BedRoom/DHT22/Temperature":
-		DHT22_Temp_Data_Handler(jsonData)
-	elif Topic == "Home/BedRoom/DHT22/Humidity":
-		DHT22_Humidity_Data_Handler(jsonData)	
-
-#===============================================================
+	if Topic == "Home/BartekDawid/Temperature":
+		tempHandler(jsonData)
+	elif Topic == "Home/BartekDawid/Humidity":
+		humHandler(jsonData)
+	elif Topic == "Home/BartekDawid/Acidity":
+		acidityHandler(jsonData)
