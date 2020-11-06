@@ -8,8 +8,6 @@
 
 
 from pymongo import MongoClient
-from bson.objectid import ObjectId
-import pymongo
 import json
 
 client = MongoClient(
