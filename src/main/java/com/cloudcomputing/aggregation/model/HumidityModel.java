@@ -3,10 +3,10 @@ package com.cloudcomputing.aggregation.model;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "temperature")
+@Document("humidity")
 @Data
-public class TemperatureModel {
-private String sensorId;
-private String date;
-private Long temp;
+public class HumidityModel {
+    private String sensorId;
+    private String date;
+    private Long humidity;
 }
