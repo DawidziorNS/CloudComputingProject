@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CloudComputingClassAPI.iml" filepath="$PROJECT_DIR$/CloudComputingClassAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aggregation.iml" filepath="$PROJECT_DIR$/aggregation.iml" />
     </modules>
   </component>
 </project>

@@ -32,7 +32,7 @@ public class HumidityService {
     public HumidityAverageDTO getAverageHumidityByPlantName(String name){
         DoubleSummaryStatistics doubleSummaryStatistics=getHumidityByPlantName(name)
                 .stream()
-                .filter(p-> p.getDate().isAfter(LocalDateTime.now().minus(1, ChronoUnit.DAYS)))
+                //.filter(p-> p.getDate().isAfter(LocalDateTime.now().minus(1, ChronoUnit.DAYS)))
                 .mapToDouble(x->x.getHumidity())
                 .summaryStatistics();
 
